@@ -16,9 +16,9 @@ https://gist.github.com/TejaSreenivas/044ef3d6aa57b6ea13b7c38c734d045c
 
 *`visualize activations with TensorFlow`*
 
-![img](https://github.com/TejaSreenivas/blog_CNN_visualization/blob/master/outputs/layer_1_1-2.png)`*Layer 1_1 (First layer in VGG-16)*`
+![img](https://raw.githubusercontent.com/TejaSreenivas/blog_CNN_visualization/master/outputs/layer_1_1-2.png)`*Layer 1_1 (First layer in VGG-16)*`
 
-![img](https://github.com/TejaSreenivas/blog_CNN_visualization/blob/master/outputs/layer_5_3-2.png)`*Layer 5_3 (Last layer in VGG-16)*`
+![img](https://raw.githubusercontent.com/TejaSreenivas/blog_CNN_visualization/master/outputs/layer_5_3-2.png)`*Layer 5_3 (Last layer in VGG-16)*`
 
 ## 2. Plotting Feature vector
 
@@ -34,17 +34,17 @@ https://gist.github.com/TejaSreenivas/044ef3d6aa57b6ea13b7c38c734d045c
 
 This is similar to activation visualization- here, instead identifying the image which maximally activates the filter, we identify a specific sub-region of an image. By iterating over hundreds of similar images we can identify  the feature a filter or neuron can identify; by producing maximum activation. 
 
-![img](https://github.com/TejaSreenivas/blog_CNN_visualization/blob/master/outputs/download.jpg)`*Maximally activated patches for 5 units*`
+![img](https://raw.githubusercontent.com/TejaSreenivas/blog_CNN_visualization/master/outputs/download.jpg)`*Maximally activated patches for 5 units*`
 
 ## 4. Occlusion Experiment
 
 In occlusion experiment we block a portion of image and plot a heat map of the class probability obtained by placing a patch at different positions of the image. By doing this we are looking how each patch of the image is contributing to the class probability. Illustrating the below examples, the obtained occlusion probability distribution is the function of class probability obtained when the region is masked(or blacked out) and this implies the lower probability value in the heat-map indicates that the region is essential in determining the class of the image. 
 
-![img](https://github.com/TejaSreenivas/blog_CNN_visualization/blob/master/outputs/download-6.png)*`Example 1 - Class: Hen`*
+![img](https://raw.githubusercontent.com/TejaSreenivas/blog_CNN_visualization/master/outputs/download-6.png)*`Example 1 - Class: Hen`*
 
 
 
-![img](https://github.com/TejaSreenivas/blog_CNN_visualization/blob/master/outputs/download-7.png)*`Example 2 - Class:  Labrador `*
+![img](https://raw.githubusercontent.com/TejaSreenivas/blog_CNN_visualization/master/outputs/download-7.png)*`Example 2 - Class:  Labrador `*
 
 
 
@@ -56,11 +56,11 @@ From the above TensorFlow implementation of occlusion experiment, the patch size
 
 This is a gradient based approach in where we compute the gradient of output class Yc w.r.t input image. In Saliency maps, we can identify those set of pixels that are used for determining the class of the image. This method is quite efficient because we can identify the pixels with just single backpropagation. In the paper  [Deep Inside Convolutional Networks](https://arxiv.org/abs/1312.6034), the authors demonstrate that saliency maps produce better object segmentation without training dedicated segmentation or detection model. The following images are the saliency maps obtained for the above examples. 
 
-![img](https://github.com/TejaSreenivas/blog_CNN_visualization/blob/master/outputs/download-8.png)`*Saliency maps for Hen (Example 1)*`
+![img](https://raw.githubusercontent.com/TejaSreenivas/blog_CNN_visualization/master/outputs/download-8.png)`*Saliency maps for Hen (Example 1)*`
 
 
 
-![img](https://github.com/TejaSreenivas/blog_CNN_visualization/blob/master/outputs/download-9.png)`*Saliency maps for Labrador (Example 2)*`
+![img](https://raw.githubusercontent.com/TejaSreenivas/blog_CNN_visualization/master/outputs/download-9.png)`*Saliency maps for Labrador (Example 2)*`
 
 
 
@@ -76,20 +76,20 @@ https://gist.github.com/TejaSreenivas/4a2ab5cddb7699ddcf2075a1107f3d5c
 
 Before get into this method I like to give an overview of deconv net since it is used to produce similar visualization as that of guided backprop approach. In Deconvnet, the feature activation of intermediate layers is mapped back to the input image. The initial input image is a zero image. In this approach the convolutional layers are replaced with deconvolutional layer(which is an unfortunate misnomer since there is no Deconvolutional operation happening in this layer), and pooling with unpooling layer, which consists of switches which record the positions of max values during the max-pooling thus obtaining approximate inverse of max-pooling. Personally it didn’t look simple to implement so I am just using examples from [the paper](https://arxiv.org/abs/1311.2901) itself to show you what the results look like. The following figure illustrates the deconvnet. 
 
-![img](https://github.com/TejaSreenivas/blog_CNN_visualization/blob/master/outputs/screen-shot-2016-06-15-at-10-32-01-am.png)`*DeconvNet   
+![img](https://raw.githubusercontent.com/TejaSreenivas/blog_CNN_visualization/master/outputs/screen-shot-2016-06-15-at-10-32-01-am.png)`*DeconvNet   
 Ref: [Visualizing and understanding CNNs](https://arxiv.org/abs/1311.2901)*`
 
 This sort of visualization can be achieved by simply replacing the Relu activation function with guided Relu as proved in the paper - [STRIVING FOR SIMPLICITY: THE ALL CONVOLUTIONAL NET](https://arxiv.org/abs/1412.6806). The working of guided relu is illustrate in the following figure. 
 
-![img](https://github.com/TejaSreenivas/blog_CNN_visualization/blob/master/outputs/0934a65fc4bb4720b653ba8c4d301ea7.png)`*a) Given an input image, we perform the forward pass to the layer we are interested in, then set to zero all activations except one and propagate back to the image to get a reconstruction. 
+![img](https://raw.githubusercontent.com/TejaSreenivas/blog_CNN_visualization/master/outputs/0934a65fc4bb4720b653ba8c4d301ea7.png)`*a) Given an input image, we perform the forward pass to the layer we are interested in, then set to zero all activations except one and propagate back to the image to get a reconstruction. 
 b) Different methods of propagating back through a ReLU nonlinearity. 
 c) Formal definition of different methods for propagating a output activation out back through a ReLU unit in layer l* `
 
 The following are the results obtained for the above mentioned two example images using guided backpropagation. 
 
-![img](https://github.com/TejaSreenivas/blog_CNN_visualization/blob/master/outputs/download-16.png)`*Guided backprop for Hen image*`
+![img](https://raw.githubusercontent.com/TejaSreenivas/blog_CNN_visualization/master/outputs/download-16.png)`*Guided backprop for Hen image*`
 
-![img](https://github.com/TejaSreenivas/blog_CNN_visualization/blob/master/outputs/download-14.png)`*Guided backprop for Dog image*`
+![img](https://raw.githubusercontent.com/TejaSreenivas/blog_CNN_visualization/master/outputs/download-14.png)`*Guided backprop for Dog image*`
 
 While being simple to implement, this method produces sharper and more descriptive visualization when compared to other methods even in the absence of switches. The following is the implementation of Guided backpropagation using TensorFlow.
 
@@ -101,9 +101,9 @@ We can consider Gradient weighted Class Activation Maps (Grad-CAM) as an upgrade
 
  Pixel-space gradient visualizations such as deconvnets or guided backpropagation produce fine grain details but cannot distinguish different categories, thus we observe both cat and dog details in the image produced by the Guided backpropogation method for Example-2 . We can leverage the highly class-discriminative nature of Grad-CAM to produce better localization or identifying the attention of the trained model over the image.  
 
-![img](https://github.com/TejaSreenivas/blog_CNN_visualization/blob/master/outputs/download-19.png)`*Grad-CAM for category - ' Labrador '*`
+![img](https://raw.githubusercontent.com/TejaSreenivas/blog_CNN_visualization/master/outputs/download-19.png)`*Grad-CAM for category - ' Labrador '*`
 
-![img](https://github.com/TejaSreenivas/blog_CNN_visualization/blob/master/outputs/download-18.png)`*Grad-CAM for category - 'tabby cat'*`
+![img](https://raw.githubusercontent.com/TejaSreenivas/blog_CNN_visualization/master/outputs/download-18.png)`*Grad-CAM for category - 'tabby cat'*`
 
 https://gist.github.com/TejaSreenivas/b3bea3291f762522d5508b621bcaf1a3
 
