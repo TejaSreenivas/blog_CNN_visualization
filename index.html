@@ -1,0 +1,494 @@
+<!DOCTYPE HTML>
+<!--
+	Prologue by HTML5 UP
+	html5up.net | @ajlkn
+	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+-->
+<html>
+	<head>
+		<title>Prologue by HTML5 UP</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+		<link rel="stylesheet" href="assets/css/main.css" />
+	</head>
+	<body class="is-preload">
+
+		<!-- Header -->
+			<div id="header">
+
+				<div class="top">
+
+					<!-- Logo -->
+						<div id="logo">
+							<span class="image avatar48"><img src="images/avatar.jpg" alt="" /></span>
+							<h1 id="title">Jane Doe</h1>
+							<p>Hyperspace Engineer</p>
+						</div>
+						<div class="top" style="text-align: center;">Index</div>
+					<!-- Nav -->
+						<nav id="nav" style="text-align: center;">
+							<ul>
+								<li><a href="#intro" id="intro-link"><span class="icon solid ">Intro</span></a></li>
+								<li><a href="#head1" id="head1-link"><span class="icon solid ">1. Visualizing Activations</span></a></li>
+								<li><a href="#head2" id="head2-link"><span class="icon solid ">2. Plotting Feature vector</span></a></li>
+								<li><a href="#head3" id="head3-link"><span class="icon solid ">3. Maximally Activated Patch</span></a></li>
+								<li><a href="#head4" id="head4-link"><span class="icon solid ">4. Occlusion Experiment</span></a></li>
+								<li><a href="#head5" id="head5-link"><span class="icon solid ">5. Saliency Maps</span></a></li>
+								<li><a href="#head6" id="head6-link"><span class="icon solid ">6. Guided backprop</span></a></li>
+								<li><a href="#head7" id="head7-link"><span class="icon solid ">7. Grad-CAM</span></a></li>
+								<li><a href="#refers" id="head8-link"><span class="icon solid ">References</span></a></li>
+							</ul>
+						</nav>
+
+				</div>
+
+				<div class="bottom">
+
+					<!-- Social Icons -->
+						<ul class="icons">
+							<li><a href="#" class="icon brands fa-twitter"><span class="label">Twitter</span></a></li>
+							<li><a href="#" class="icon brands fa-facebook-f"><span class="label">Facebook</span></a></li>
+							<li><a href="#" class="icon brands fa-github"><span class="label">Github</span></a></li>
+							<li><a href="#" class="icon brands fa-dribbble"><span class="label">Dribbble</span></a></li>
+							<li><a href="#" class="icon solid fa-envelope"><span class="label">Email</span></a></li>
+						</ul>
+
+				</div>
+
+			</div>
+
+		<!-- Main -->
+			<div id="main">
+
+				<!-- Intro -->
+					<!-- <section id="top" class="one dark cover">
+						<div class="container">
+
+							<header>
+								<h2 class="alt">Hi! I'm <strong>Prologue</strong>, a <a href="http://html5up.net/license">free</a> responsive<br />
+								site template designed by <a href="http://html5up.net">HTML5 UP</a>.</h2>
+								<p>Ligula scelerisque justo sem accumsan diam quis<br />
+								vitae natoque dictum sollicitudin elementum.</p>
+							</header>
+
+							<footer>
+								<a href="#portfolio" class="button scrolly">Magna Aliquam</a>
+							</footer>
+
+						</div>
+					</section> -->
+
+				<!-- Portfolio -->
+					<section id="intro" class="two">
+						<div class="container">
+
+							<header>
+								<h2>Visualizing CNNs in TensorFlow!</h2>
+							</header>
+
+							<p>All Neural Network including convolutional Neural Networks are essentially black box, which makes them harder to
+								debug. Debugging in this context does not mean finding errors in the architecture while coding the model but rather
+								determining whether the trained model is truly able to achieve the projected test accuracy. Let me elaborate, after
+								training the model we run the model on test data to obtain an accuracy of, let’s say, 80%. From this we assume that
+								when we pick 10 random data points (images) outside the dataset, the trained model will classify 8 of them
+								correctly. Unfortunately, that is not the case. Most of the dataset used for training the model are likely to have
+								some biases, for instance, we can have a dataset for classifying the male from female images and unnoticed (let’s
+								assume), we have most of the men in the dataset wearing caps. This could cause the model to predict people, either
+								male or female, with hat as male. Unlike the previous example some biases are subtle and less apparent. This is not
+								the only case where neural network fail; people can fine-tune an image from the train dataset itself to trick the
+								network. Such examples are called Adversarial examples. Citing an example from the <a
+									href='https://arxiv.org/abs/1412.6572'>paper</a> by Ian J. Goodfellow, we see network classifies an image as
+								panda with a confidence of 57.5% and by adding a certain noise it classifies it was gibbon with 99% confidence,
+								although the image remained virtually same for us. </p>
+							<p>Thus, in order to address such issues with training neural network we need to peer into the working of a neural
+								network. This blog emphasizes some of the visualization methods used in Convolutional Neural Network.</p>
+							<p> This blog will be give you hands-on experience of implementation of various CNN visualization techniques. The order
+								of various topics discussed in this blog is in coherence with the <a
+									href='https://www.youtube.com/watch?v=6wcs6szJWMY'>Lecture 12 | Visualizing and Understanding</a> by <a
+									href='https://www.youtube.com/user/stanfordeng'>Stanford University School of Engineering</a>. </p>
+							<div class="embed-responsive embed-responsive-16by9" style="text-align: center;">
+								<iframe width="640" height="360" src="https://www.youtube.com/embed/6wcs6szJWMY" 
+									allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+							</div>
+					</section>
+
+				<!-- 1. Visualizing activations -->
+					<section id="about" class="two">
+						<div class="container">
+
+							<header>
+								<h2>1. Visualizing Activations</h2>
+							</header>
+
+							<p> The structural parts of a convolutional neural network are its filters. These filters can identify from simple
+								features to more complex features as we go up the convolutional layer stack. Since the filters are just stack of 2D
+								matrices we can be plotted them directly. But these filters are either 3x3 or 5x5 matrices, plotting them would not
+								reveal much about their nature, Instead we plot the activations or feature maps of these filters when we run an
+								image through the convolutional network. </p>
+
+							<script src="https://gist.github.com/TejaSreenivas/044ef3d6aa57b6ea13b7c38c734d045c.js"></script>
+							<p><em><code>Code: visualize activations using TensorFlow (version 1.x)</code></em></p>
+
+							<div class="row" style="text-align: center;">
+								<div class="col-6">
+									<article class="item">
+										<a href="#" class="image fit"><img src="https://raw.githubusercontent.com/TejaSreenivas/blog_CNN_visualization/master/outputs/layer_1_1-2.png" 
+											alt="" style="width: 100%;" /></a>
+										<header>
+											<h3>Layer 1_1 (First layer in VGG-16)</h3>
+										</header>
+									</article>
+									</div>
+								<div class="col-6">
+									<article class="item">
+										<a href="#" class="image fit"><img src="https://raw.githubusercontent.com/TejaSreenivas/blog_CNN_visualization/master/outputs/layer_5_3-2.png"
+												alt="" style="width: 100%;" /></a>
+										<header>
+											<h3>Layer 5_3 (Last layer in VGG-16)</h3>
+										</header>
+									</article>
+									</div>
+								</div>
+					</section>
+
+				<!-- 2. Plotting feature vectors -->
+				<section id="head2" class="two">
+					<div class="container">
+				
+						<header>
+							<h2>2. Plotting Feature vector</h2>
+						</header>
+				
+						<p> Feature vector of an image can be obtained from the output of the penultimate layer or the layer below the
+							classification layer, in most of the architecture it is usually fully connected layer. The activation of each image
+							obtained at this layer represents the feature vector of the image. The feature vectors obtained from many images can
+							be plot using on a two-dimensional space using dimensionality reduction algorithms such <a
+								href='https://en.wikipedia.org/wiki/Principal_component_analysis'>PCA</a> or <a
+								href='https://en.wikipedia.org/wiki/T-distributed_stochastic_neighbor_embedding'>t-SNE</a>. </p>
+
+						<div class="row" style="text-align: center;">
+							<div class="col-3"></div>
+							<div class="col-6" style="width: 50%; align-content: center;">
+								<article class="item">
+									<a href="#" class="image fit"><img
+											src="https://cs.stanford.edu/people/karpathy/cnnembed/cnn_embed_4k.jpg"
+											alt="" style="width: 100%;" /></a>
+									<header>
+										<h3>Embedded images in 2-D space using t-SNE</h3>
+									</header>
+								</article>
+							</div>
+							<div class="col-3">
+							</div>
+						</div>
+				</section>
+
+				<!-- 3. Maximally Activated Patch -->
+				<section id="head3" class="two">
+					<div class="container">
+				
+						<header>
+							<h2>3. Maximally Activated Patch</h2>
+						</header>
+				
+						<p> This is similar to activation visualization- here, instead identifying the image which maximally activates the filter,
+						we identify a specific sub-region of an image. By iterating over hundreds of similar images we can identify the feature
+						a filter or neuron can identify; by producing maximum activation. </p>
+				
+						<div class="row" style="text-align: center;">
+							<div class="col-3"></div>
+							<div class="col-6" style="width: 50%; align-content: center;">
+								<article class="item">
+									<a href="#" class="image fit"><img
+											src="https://raw.githubusercontent.com/TejaSreenivas/blog_CNN_visualization/master/outputs/download.jpg" alt=""
+											style="width: 100%;" /></a>
+									<header>
+										<h3>Maximally activated patches for 5 units</h3>
+									</header>
+								</article>
+							</div>
+							<div class="col-3">
+							</div>
+						</div>
+				</section>
+
+				<!-- 4. Occlusion Experiment -->
+				<section id="head4" class="two">
+					<div class="container">
+				
+						<header>
+							<h2>4. Occlusion Experiment</h2>
+						</header>
+				
+						<p> In occlusion experiment we block a portion of image and plot a heat map of the class probability obtained by placing a
+						patch at different positions of the image. By doing this we are looking how each patch of the image is contributing to
+						the class probability. Illustrating the below examples, the obtained occlusion probability distribution is the function
+						of class probability obtained when the region is masked(or blacked out) and this implies the lower probability value in
+						the heat-map indicates that the region is essential in determining the class of the image.</p>
+						
+						<div class="row" style="text-align: center; width: 70%; float: none; margin: 0 auto;">
+							<div class="col-6">
+								<article class="item">
+									<a href="#" class="image fit"><img
+											src="https://raw.githubusercontent.com/TejaSreenivas/blog_CNN_visualization/master/outputs/download-6.png"
+											alt="" style="width: 100%;" /></a>
+									<header>
+										<h3>Example 1 - Class: Hen</h3>
+									</header>
+								</article>
+							</div>
+							<div class="col-6">
+								<article class="item">
+									<a href="#" class="image fit"><img
+											src="https://raw.githubusercontent.com/TejaSreenivas/blog_CNN_visualization/master/outputs/download-7.png"
+											alt="" style="width: 100%;" /></a>
+									<header>
+										<h3>Example 2 - Class: Labrador</h3>
+									</header>
+								</article>
+							</div>
+							</div>
+							<br>
+							<script src="https://gist.github.com/TejaSreenivas/7648219dd2b2114cd81aad5add671ee1.js"></script>
+							<p><em><code>Code: Occlusion using TensorFlow (version 1.x)</code></em></p>
+						<p>From the above TensorFlow implementation of occlusion experiment, the patch size determines the mask dimension. If
+							the mask dimension is too small we would not find much difference in the probability variation and on the other hand
+							if the mask size is too large we cannot precisely determine the area of the interest that influences the class
+							probability. </p>
+						</div>
+				</section>
+
+				<!-- 5. Saliency Maps -->
+				<section id="head5" class="two">
+					<div class="container">
+				
+						<header>
+							<h2>5. Saliency Maps</h2>
+						</header>
+				
+						<p> This is a gradient based approach in where we compute the gradient of output class Yc w.r.t input image. In Saliency
+						maps, we can identify those set of pixels that are used for determining the class of the image. This method is quite
+						efficient because we can identify the pixels with just single backpropagation. In the paper <a
+							href='https://arxiv.org/abs/1312.6034'>Deep Inside Convolutional Networks</a>, the authors demonstrate that saliency
+						maps produce better object segmentation without training dedicated segmentation or detection model. The following images
+						are the saliency maps obtained for the above examples.</p>
+				
+						<div class="row" style="text-align: center; width: 70%; float: none; margin: 0 auto;">
+							<div class="col-6">
+								<article class="item">
+									<a href="#" class="image fit"><img
+											src="https://raw.githubusercontent.com/TejaSreenivas/blog_CNN_visualization/master/outputs/download-8.png"
+											alt="" style="width: 100%;" /></a>
+									<header>
+										<h3>Saliency maps for Hen (Example 1)</h3>
+									</header>
+								</article>
+							</div>
+							<div class="col-6">
+								<article class="item">
+									<a href="#" class="image fit"><img
+											src="https://raw.githubusercontent.com/TejaSreenivas/blog_CNN_visualization/master/outputs/download-9.png"
+											alt="" style="width: 100%;" /></a>
+									<header>
+										<h3>Saliency maps for Labrador (Example 2)</h3>
+									</header>
+								</article>
+							</div>
+						</div>
+						<br>
+						<script src="https://gist.github.com/TejaSreenivas/4a2ab5cddb7699ddcf2075a1107f3d5c.js"></script>
+						<p><em><code>Code: The TF(version 1.x) code for the this visualization is fairly straight forward as shown above.</code></em></p>
+						
+					</div>
+				</section>
+
+				<!-- 6. Guided backprop -->
+				<section id="head6" class="two">
+					<div class="container">
+				
+						<header>
+							<h2>6. Visualization using Guided backprop</h2>
+						</header>
+				
+						<p>Before get into this method I like to give an overview of deconv net since it is used to produce similar visualization
+						as that of guided backprop approach. In Deconvnet, the feature activation of intermediate layers is mapped back to the
+						input image. The initial input image is a zero image. In this approach the convolutional layers are replaced with
+						deconvolutional layer(which is an unfortunate misnomer since there is no Deconvolutional operation happening in this
+						layer), and pooling with unpooling layer, which consists of switches which record the positions of max values during the
+						max-pooling thus obtaining approximate inverse of max-pooling. Personally it didn’t look simple to implement so I am
+						just using examples from <a href='https://arxiv.org/abs/1311.2901'>the paper</a> itself to show you what the results
+						look like. The following figure illustrates the deconvnet.</p>
+						
+						<p>This sort of visualization can be achieved by simply replacing the Relu activation function with guided Relu as
+							proved in the paper - <a href='https://arxiv.org/abs/1412.6806'>STRIVING FOR SIMPLICITY: THE ALL CONVOLUTIONAL
+								NET</a>. The working of guided relu is illustrate in the following figure. </p>
+
+						<div class="row" style="text-align: center; width: 100%; float: none; margin: 0 auto;">
+							<div class="col-5">
+								<article class="item" >
+									<a href="#" class="image fit"><img
+											src="https://raw.githubusercontent.com/TejaSreenivas/blog_CNN_visualization/master/outputs/screen-shot-2016-06-15-at-10-32-01-am.png"
+											alt="" style="width: 100%;" /></a>
+									<header>
+										<h3>DeconvNet</h3>
+										Ref: <a href='https://arxiv.org/abs/1311.2901'>Visualizing and understanding CNNs</a>
+									</header>
+								</article>
+							</div>
+							<div class="col-7" style="text-align: justify;">
+								<article class="item">
+									<a href="#" class="image fit"><img
+											src="https://raw.githubusercontent.com/TejaSreenivas/blog_CNN_visualization/master/outputs/0934a65fc4bb4720b653ba8c4d301ea7.png"
+											alt="" style="width: 100%;" /></a>
+									<header>
+										<ol type="a">
+											<li>Given an input image, we perform the forward pass to the layer we are interested in, then set to zero all activations
+											except one and propagate back to the image to get a reconstruction.</li>
+											<li>Different methods of propagating back through a ReLU nonlinearity.</li>
+											<li>Formal definition of different methods for propagating a output activation out back through a ReLU unit in layer l</li>
+										</ol>
+									</header>
+								</article>
+							</div>
+						</div>
+						<p>The following are the results obtained for the above mentioned two example images using guided backpropagation. </p>
+						<div class="row" style="text-align: center; width: 70%; float: none; margin: 0 auto;">
+							<div class="col-6">
+								<article class="item">
+									<a href="#" class="image fit"><img
+											src="https://raw.githubusercontent.com/TejaSreenivas/blog_CNN_visualization/master/outputs/download-16.png"
+											alt="" style="width: 100%;" /></a>
+									<header>
+										<h3>Guided backprop for Hen image</h3>
+									</header>
+								</article>
+							</div>
+							<div class="col-6">
+								<article class="item">
+									<a href="#" class="image fit"><img
+											src="https://raw.githubusercontent.com/TejaSreenivas/blog_CNN_visualization/master/outputs/download-14.png"
+											alt="" style="width: 100%;" /></a>
+									<header>
+										<h3>Guided backprop for Dog image</h3>
+									</header>
+								</article>
+							</div>
+						</div>
+						<p>While being simple to implement, this method produces sharper and more descriptive visualization when compared to
+							other methods even in the absence of switches. The following is the implementation of Guided backpropagation using
+							TensorFlow.</p>
+						<script src="https://gist.github.com/TejaSreenivas/27d476006f14500d4c8bf04122c3210b.js"></script>
+						<!-- <p><em><code>Code: The TF(version 1.x) code for the this visualization is fairly straight forward as shown above.</code></em>
+						</p> -->
+					</div>
+				</section>
+				<!-- 7. Grad-CAM -->
+				<section id="head7" class="two">
+					<div class="container">
+				
+						<header>
+							<h2>7. Grad-CAM</h2>
+						</header>
+				
+						<p> We can consider Gradient weighted Class Activation Maps (Grad-CAM) as an upgrade to Class Activation Maps, which are
+						produced by replacing the final fully connected layer with Global-Max pooling,requiring to retrain the modified
+						architecture. The Class Activation Maps over the input image help to identify important regions in the image for
+						prediction. Grad-CAM are more interpretable when compared to other methods. This method produces the gradient map over
+						the input image, using the trained model, thus enables us to give better justification for why a model predicts what it
+						predicts. In the <a href='https://arxiv.org/abs/1610.02391'>Grad-CAM paper</a>, it is elucidated that Grad-CAM is more
+						interpretable, and faithful to the model which makes it a good visualization technique. The best thing about Grad-CAM is
+						that it does not need the model to be retrained; we can use Grad-CAM on the trained model right of the box.</p>
+						<p> Pixel-space gradient visualizations such as deconvnets or guided backpropagation produce fine grain details but
+							cannot distinguish different categories, thus we observe both cat and dog details in the image produced by the
+							Guided backpropogation method for Example-2 . We can leverage the highly class-discriminative nature of Grad-CAM to
+							produce better localization or identifying the attention of the trained model over the image.</p>
+				
+						<div class="row" style="text-align: center; width: 70%; float: none; margin: 0 auto;">
+							<div class="col-6">
+								<article class="item">
+									<a href="#" class="image fit"><img
+											src="https://raw.githubusercontent.com/TejaSreenivas/blog_CNN_visualization/master/outputs/download-19.png"
+											alt="" style="width: 100%;" /></a>
+									<header>
+										<h3>Grad-CAM for category - &#39; Labrador &#39;</h3>
+									</header>
+								</article>
+							</div>
+							<div class="col-6">
+								<article class="item">
+									<a href="#" class="image fit"><img
+											src="https://raw.githubusercontent.com/TejaSreenivas/blog_CNN_visualization/master/outputs/download-18.png"
+											alt="" style="width: 100%;" /></a>
+									<header>
+										<h3>Grad-CAM for category - &#39;tabby cat&#39;</h3>
+									</header>
+								</article>
+							</div>
+						</div>
+						<br>
+						<script src="https://gist.github.com/TejaSreenivas/b3bea3291f762522d5508b621bcaf1a3.js"></script>
+						<p><em><code>Code: TensorFlow(version 1.x) implementation of Grad-CAM.</code></em>
+						</p>
+				
+					</div>
+				</section>
+
+				<!-- Contact -->
+					<section id="refers" class="four">
+						<div class="container">
+
+							<header>
+								<h2>References</h2>
+							</header>
+
+							<p>
+								<ul>
+									<li>Visualizing activations - <a href='https://arxiv.org/abs/1506.06579'>Understanding Neural Networks Through Deep
+											Visualization</a></li>
+									<li>Plotting feature vector - <a href='https://cs.stanford.edu/people/karpathy/cnnembed/'>t-SNE visualization of CNN
+											codes</a></li>
+									<li>Occlusion Experiment &amp; Deconvnet - <a href='https://arxiv.org/abs/1311.2901'>Visualizing and Understanding
+											Convolutional Networks</a></li>
+									<li>Saliency Maps - <a href='https://arxiv.org/abs/1312.6034'>Deep Inside Convolutional Networks</a> </li>
+									<li>Guided Backpropagation - <a href='https://arxiv.org/abs/1412.6806'>STRIVING FOR SIMPLICITY: THE ALL
+											CONVOLUTIONAL NET</a> </li>
+									<li><a href='https://arxiv.org/abs/1610.02391'>Grad-CAM: Visual Explanations from Deep Networks via Gradient-based
+											Localization</a></li>
+									<li><a href='https://deepvision-tensorflow.readthedocs.io/en/latest/_modules/tensorcv/models/layers.html'>Global Avg
+											pooling code</a></li>
+									<li>Vgg16 model - <a href='http://www.cs.toronto.edu/~frossard/post/vgg16/' target='_blank'
+											class='url'>http://www.cs.toronto.edu/~frossard/post/vgg16/</a></li>
+									<li>Vgg16 model weights - <a href='https://github.com/ethereon/caffe-tensorflow' target='_blank'
+											class='url'>https://github.com/ethereon/caffe-tensorflow</a> </li>
+									<li>Google Colab notebook for this blog - <a href='https://github.com/TejaSreenivas/blog_CNN_visualization/'
+											target='_blank' class='url'>https://github.com/TejaSreenivas/blog_CNN_visualization/</a> </li>
+								
+								</ul>
+							</p>
+
+						</div>
+					</section>
+
+			</div>
+
+		<!-- Footer -->
+			<div id="footer">
+
+				<!-- Copyright -->
+					<ul class="copyright">
+						<li>&copy; Untitled. All rights reserved.</li><li>Design: <a href="http://html5up.net">HTML5 UP</a></li>
+					</ul>
+
+			</div>
+
+		<!-- Scripts -->
+			<script src="assets/js/jquery.min.js"></script>
+			<script src="assets/js/jquery.scrolly.min.js"></script>
+			<script src="assets/js/jquery.scrollex.min.js"></script>
+			<script src="assets/js/browser.min.js"></script>
+			<script src="assets/js/breakpoints.min.js"></script>
+			<script src="assets/js/util.js"></script>
+			<script src="assets/js/main.js"></script>
+
+	</body>
+</html>
